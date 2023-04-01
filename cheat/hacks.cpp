@@ -40,11 +40,6 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 			if (entityTeam == localTeam)
 				continue;
 
-			const auto lifeState = mem.Read<int32_t>(entity + offsets::m_lifeState);
-
-			if (lifeState != 0)
-				continue;
-
 			if (globals::glow)
 			{
 				const auto glowIndex = mem.Read<int32_t>(entity + offsets::m_iGlowIndex);
@@ -67,9 +62,7 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 			// CHAMS
 			if (globals::chams)
 			{
-				if (mem.Read<uintptr_t>(entity + offsets::m_iTeamNum) == localTeam)
-					mem.Write(entity + offsets::m_clrRender, globals::chamsTeamColor);
-				else
+				if (mem.Read<uintptr_t>(entity + offsets::m_iTeamNum) != localTeam)
 					mem.Write(entity + offsets::m_clrRender, globals::chamsEnemyColor);
 
 				// model brightness bullshit
@@ -80,8 +73,17 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 			}
 
 			// Ignore Flash
-			if (globals::ignoreFlash)
-				mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f);
+			if (globals::ignoreFlash) { mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f); }
+			
+			// Fov
+			if (globals::fov)
+			{
+				mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);
+			}
+			else 
+			{
+				mem.Write(localPlayer + offsets::m_iFOV, 90);
+			}
 		}
 
 	}

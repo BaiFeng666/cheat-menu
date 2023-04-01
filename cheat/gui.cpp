@@ -256,10 +256,15 @@ void gui::Render() noexcept
 	ImGui::Checkbox("radar", &globals::radar);
 	ImGui::Checkbox("chams", &globals::chams);
 	ImGui::Checkbox("ignore flash", &globals::ignoreFlash);
+
 	ImGui::Checkbox("aimbot", &globals::aimbot);
 	ImGui::SliderFloat("aimbot smoothness", &globals::aimbotSmooth, 1.f, 20.f);
+
 	ImGui::Checkbox("glow", &globals::glow);
 	ImGui::ColorEdit4("glow color", globals::glowColor);
+
+	ImGui::Checkbox("Fov", &globals::fov);
+	ImGui::SliderInt("Fov Changer", &globals::fovValue, 60, 130);
 
 	ImGui::End();
 }

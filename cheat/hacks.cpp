@@ -5,6 +5,7 @@
 #include <thread>
 using namespace std;
 
+
 constexpr Vector3 CalculateAngle(
 	const Vector3& localPosition,
 	const Vector3& enemyPosition,
@@ -17,7 +18,7 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 {
 	while (gui::isRunning)
 	{
-		this_thread::sleep_for(chrono::milliseconds(1));
+		this_thread::sleep_for(chrono::milliseconds(5));
 
 		const auto localPlayer = mem.Read<uintptr_t>(globals::clientAddress + offsets::dwLocalPlayer);
 		if (!localPlayer)
@@ -42,6 +43,7 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 
 			if (globals::glow)
 			{
+
 				const auto glowIndex = mem.Read<int32_t>(entity + offsets::m_iGlowIndex);
 
 				mem.Write(glowManager + (glowIndex * 0x38) + 0x8, globals::glowColor[0]); // red
@@ -62,8 +64,12 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 			// CHAMS
 			if (globals::chams)
 			{
+				uint8_t EnemyColor[] = {0, 0, 0};
+				for (int i = 0; i < 3; ++i)
+					EnemyColor[i] = uint8_t(globals::chamsGuiEnemyColor[i] * 255);
+					
 				if (mem.Read<uintptr_t>(entity + offsets::m_iTeamNum) != localTeam)
-					mem.Write(entity + offsets::m_clrRender, globals::chamsEnemyColor);
+					mem.Write(entity + offsets::m_clrRender, EnemyColor);
 
 				// model brightness bullshit
 				float brightness = 25.f;
@@ -73,17 +79,15 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 			}
 
 			// Ignore Flash
-			if (globals::ignoreFlash) { mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f); }
+			if (globals::ignoreFlash)
+				mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f);
 			
 			// Fov
 			if (globals::fov)
-			{
 				mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);
-			}
 			else 
-			{
 				mem.Write(localPlayer + offsets::m_iFOV, 90);
-			}
+
 		}
 
 	}
@@ -145,7 +149,7 @@ void hacks::AimbotThread(const Memory& mem) noexcept
 		const auto aimPunch = mem.Read<Vector3>(localPlayer + offsets::m_aimPunchAngle) * 2;
 
 		// aimbot fov
-		auto bestFov = 5.f;
+		auto bestFov = globals::aimbotFov;
 		auto bestAngle = Vector3{ };
 
 		for (auto i = 1; i <= 64; ++i)

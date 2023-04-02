@@ -12,10 +12,10 @@ namespace globals
 
 
 	inline bool chams = false;
-	inline uint8_t chamsEnemyColor[] = { 255, 0, 0 };
+	inline float chamsGuiEnemyColor[] = { 1.f, 0.f, 0.f };
 
 	inline bool fov = false;
-	inline int fovValue = 90;
+	inline auto fovValue = 90;
 
 	inline bool bhop = false;
 
@@ -24,7 +24,8 @@ namespace globals
 	inline bool radar = false;
 
 	inline bool aimbot = false;
-	inline float aimbotSmooth = 5.f;
+	inline auto aimbotSmooth = 5.f;
+	inline auto aimbotFov = 5.f;
 
 }
 

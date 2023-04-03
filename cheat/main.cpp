@@ -15,7 +15,7 @@ int __stdcall wWinMain(
 	globals::engineAddress = mem.GetModuleAddress("engine.dll");
 
 	std::thread(hacks::VisualsThread, mem).detach();
-	std::thread(hacks::BHopThread, mem).detach();
+	std::thread(hacks::miscThread, mem).detach();
 	std::thread(hacks::AimbotThread, mem).detach();
 
 	// create gui

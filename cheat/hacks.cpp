@@ -32,8 +32,7 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 
 		for (auto i = 1; i <= 64; ++i)
 		{
-			const auto entity = mem.Read<uintptr_t>(globals::clientAddress + offsets::dwEntityList + i * 0x10);
-
+			const auto entity = mem.Read<uintptr_t>(globals::clientAddress + offsets::dwEntityList + i * 0x10);	
 			if (!entity)
 				continue;
 
@@ -41,6 +40,8 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 			if (entityTeam == localTeam)
 				continue;
 
+
+			// ----------GLOW----------
 			if (globals::glow)
 			{
 
@@ -57,11 +58,7 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 
 			}
 
-			// RADAR
-			if (globals::radar)
-				mem.Write(entity + offsets::m_bSpotted, true);
-
-			// CHAMS
+			//----------CHAMS----------
 			if (globals::chams)
 			{
 				uint8_t EnemyColor[] = {0, 0, 0};
@@ -75,54 +72,59 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 				float brightness = 25.f;
 				const auto _this = static_cast<uintptr_t>(globals::engineAddress + offsets::model_ambient_min - 0x2c);
 				mem.Write(globals::engineAddress + offsets::model_ambient_min, *reinterpret_cast<uintptr_t*>(&brightness) ^ _this);
-
 			}
-
-			// Ignore Flash
-			if (globals::ignoreFlash)
-				mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f);
-			
-			// Fov
-			if (globals::fov)
-				mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);
-			else 
-				mem.Write(localPlayer + offsets::m_iFOV, 90);
-
 		}
-
 	}
 }
 
-void hacks::BHopThread(const Memory& mem) noexcept
+void hacks::miscThread(const Memory& mem) noexcept
 {
 	while (gui::isRunning)
 	{
 		this_thread::sleep_for(chrono::milliseconds(1));
 
-		if (!GetAsyncKeyState(VK_SPACE))
-			continue;
-
 		// get local player
 		const auto localPlayer = mem.Read<intptr_t>(globals::clientAddress + offsets::dwLocalPlayer);
-
 		if (!localPlayer)
 			continue;
 
 		// is alive?
 		const auto health = mem.Read<int32_t>(localPlayer + offsets::m_iHealth);
-
 		if (!health)
 			continue;
 
+		// ----------BHOP----------
 		const auto flags = mem.Read<int32_t>(localPlayer + offsets::m_fFlags);
+		if (globals::bhop)
+			if (GetAsyncKeyState(VK_SPACE))
+			{
+				// 6 = force jump, 4 = reset
+				(flags & (1 << 0)) ?
+					mem.Write<intptr_t>(globals::clientAddress + offsets::dwForceJump, 6) :
+					mem.Write<intptr_t>(globals::clientAddress + offsets::dwForceJump, 4);
+			}
 
-		// on ground
-		// 6 = force jump, 4 = reset
-		if (globals::bhop) {
-			(flags & (1 << 0)) ?
-				mem.Write<intptr_t>(globals::clientAddress + offsets::dwForceJump, 6) :
-				mem.Write<intptr_t>(globals::clientAddress + offsets::dwForceJump, 4);
+		// ----------RADAR----------
+		for (auto i = 1; i <= 64; ++i) {
+			const auto entity = mem.Read<uintptr_t>(globals::clientAddress + offsets::dwEntityList + i * 0x10);
+			if (!entity)
+				continue;
+
+			if (globals::radar)
+				mem.Write(entity + offsets::m_bSpotted, true);
 		}
+		
+
+		// ----------Ignore Flash----------
+		if (globals::ignoreFlash)
+			mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f);
+
+		// ----------Fov----------
+		if (globals::fov)
+			mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);
+		else
+			mem.Write(localPlayer + offsets::m_iFOV, 90);
+
 	}
 }
 

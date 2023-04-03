@@ -8,5 +8,5 @@ namespace hacks
 	// run misc thread
 	void miscThread(const Memory& mem) noexcept;
     // run aimbot thread
-	void AimbotThread(const Memory& mem) noexcept;
+	void botThread(const Memory& mem) noexcept;
 }

@@ -23,6 +23,7 @@ namespace globals
 
 	inline bool radar = false;
 
+	inline bool triggerbot = false;
 	inline bool aimbot = false;
 	inline auto aimbotSmooth = 5.f;
 	inline auto aimbotFov = 5.f;

@@ -262,9 +262,10 @@ void gui::Render() noexcept
 	ImGui::Checkbox("glow", &globals::glow);
 	ImGui::ColorEdit4("glow color", globals::glowColor);
 
-	ImGui::Checkbox("Fov", &globals::fov);
-	ImGui::SliderInt("Fov Changer", &globals::fovValue, 60, 130);
+	ImGui::Checkbox("fov", &globals::fov);
+	ImGui::SliderInt("fov Changer", &globals::fovValue, 60, 130);
 
+	ImGui::Checkbox("triggerbot", &globals::triggerbot);
 	ImGui::Checkbox("aimbot", &globals::aimbot);
 	ImGui::SliderFloat("aimbot smoothness", &globals::aimbotSmooth, 1.f, 20.f);
 	ImGui::SliderFloat("aimbot fov", &globals::aimbotFov, 1.f, 30.f);

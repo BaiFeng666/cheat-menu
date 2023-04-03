@@ -5,7 +5,6 @@
 #include <thread>
 using namespace std;
 
-
 constexpr Vector3 CalculateAngle(
 	const Vector3& localPosition,
 	const Vector3& enemyPosition,
@@ -18,7 +17,7 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 {
 	while (gui::isRunning)
 	{
-		this_thread::sleep_for(chrono::milliseconds(5));
+		this_thread::sleep_for(chrono::milliseconds(7));
 
 		const auto localPlayer = mem.Read<uintptr_t>(globals::clientAddress + offsets::dwLocalPlayer);
 		if (!localPlayer)
@@ -39,12 +38,9 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 			const auto entityTeam = mem.Read<int32_t>(entity + offsets::m_iTeamNum);
 			if (entityTeam == localTeam)
 				continue;
-
-
 			// ----------GLOW----------
 			if (globals::glow)
 			{
-
 				const auto glowIndex = mem.Read<int32_t>(entity + offsets::m_iGlowIndex);
 
 				mem.Write(glowManager + (glowIndex * 0x38) + 0x8, globals::glowColor[0]); // red
@@ -55,9 +51,7 @@ void hacks::VisualsThread(const Memory& mem) noexcept
 				// render when we can and can't see
 				mem.Write(glowManager + (glowIndex * 0x38) + 0x27, true);
 				mem.Write(glowManager + (glowIndex * 0x38) + 0x28, true);
-
 			}
-
 			//----------CHAMS----------
 			if (globals::chams)
 			{
@@ -81,31 +75,27 @@ void hacks::miscThread(const Memory& mem) noexcept
 {
 	while (gui::isRunning)
 	{
-		this_thread::sleep_for(chrono::milliseconds(1));
+		this_thread::sleep_for(chrono::milliseconds(7));
 
 		// get local player
 		const auto localPlayer = mem.Read<intptr_t>(globals::clientAddress + offsets::dwLocalPlayer);
 		if (!localPlayer)
 			continue;
-
 		// is alive?
 		const auto health = mem.Read<int32_t>(localPlayer + offsets::m_iHealth);
 		if (!health)
 			continue;
-
 		// ----------BHOP----------
 		const auto flags = mem.Read<int32_t>(localPlayer + offsets::m_fFlags);
 		if (globals::bhop)
 			if (GetAsyncKeyState(VK_SPACE))
-			{
 				// 6 = force jump, 4 = reset
 				(flags & (1 << 0)) ?
 					mem.Write<intptr_t>(globals::clientAddress + offsets::dwForceJump, 6) :
 					mem.Write<intptr_t>(globals::clientAddress + offsets::dwForceJump, 4);
-			}
-
 		// ----------RADAR----------
-		for (auto i = 1; i <= 64; ++i) {
+		for (auto i = 1; i <= 64; ++i)
+        {
 			const auto entity = mem.Read<uintptr_t>(globals::clientAddress + offsets::dwEntityList + i * 0x10);
 			if (!entity)
 				continue;
@@ -113,26 +103,22 @@ void hacks::miscThread(const Memory& mem) noexcept
 			if (globals::radar)
 				mem.Write(entity + offsets::m_bSpotted, true);
 		}
-		
-
 		// ----------Ignore Flash----------
 		if (globals::ignoreFlash)
 			mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f);
-
 		// ----------Fov----------
 		if (globals::fov)
 			mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);
 		else
 			mem.Write(localPlayer + offsets::m_iFOV, 90);
-
 	}
 }
 
-void hacks::AimbotThread(const Memory& mem) noexcept
+void hacks::botThread(const Memory& mem) noexcept
 {
 	while (gui::isRunning)
 	{
-		this_thread::sleep_for(chrono::milliseconds(1));
+		this_thread::sleep_for(chrono::milliseconds(7));
 
 		// get local player
 		const auto localPlayer = mem.Read<std::uintptr_t>(globals::clientAddress + offsets::dwLocalPlayer);
@@ -156,10 +142,9 @@ void hacks::AimbotThread(const Memory& mem) noexcept
 
 		for (auto i = 1; i <= 64; ++i)
 		{
-			const auto player = mem.Read<std::uintptr_t>(globals::clientAddress + offsets::dwEntityList + i * 0x10);
 
-			//if (!GetAsyncKeyState(VK_RBUTTON))
-			//	continue;
+			// ----------AIMBOT----------
+			const auto player = mem.Read<std::uintptr_t>(globals::clientAddress + offsets::dwEntityList + i * 0x10);
 
 			if (mem.Read<std::int32_t>(player + offsets::m_iTeamNum) == localTeam)
 				continue;
@@ -173,7 +158,6 @@ void hacks::AimbotThread(const Memory& mem) noexcept
 			if (mem.Read<std::int32_t>(player + offsets::m_bSpottedByMask))
 			{
 				const auto boneMatrix = mem.Read<std::uintptr_t>(player + offsets::m_dwBoneMatrix);
-
 				// pos of player head in 3d space
 				// 8 is the head bone index :)
 				const auto playerHeadPosition = Vector3{
@@ -189,7 +173,6 @@ void hacks::AimbotThread(const Memory& mem) noexcept
 				);
 
 				const auto fov = std::hypot(angle.x, angle.y);
-
 				if (fov < bestFov)
 				{
 					bestFov = fov;
@@ -197,10 +180,36 @@ void hacks::AimbotThread(const Memory& mem) noexcept
 				}
 			}
 		}
-		if (globals::aimbot) {
-			// if we have a best angle, do aimbot
+		if (globals::aimbot)
+			// if we have the best angle, do aimbot
 			if (!bestAngle.IsZero())
 				mem.Write<Vector3>(clientState + offsets::dwClientState_ViewAngles, viewAngles + bestAngle / globals::aimbotSmooth); // smoothing
-		}
+
+        // ----------TRIGGERBOT----------
+        if(globals::triggerbot)
+        {
+            const auto localHealth = mem.Read<int32_t>(localPlayer + offsets::m_iHealth);
+            if(!localHealth)
+                continue;
+
+            // if crosshair id is bigger than 64 we are not looking at a entity
+            const auto crosshairId = mem.Read<int32_t>(localPlayer + offsets::m_iCrosshairId);
+            if(!crosshairId || crosshairId > 64)
+                continue;
+
+            const auto triggerBotPlayer = mem.Read<uintptr_t>(globals::clientAddress + offsets::dwEntityList + (crosshairId -1) * 0x10);
+
+            // check if entity is dead
+            if(!mem.Read<int32_t>(triggerBotPlayer + offsets::m_iHealth))
+                continue;
+
+            if(mem.Read<int32_t>(triggerBotPlayer + offsets::m_iTeamNum) == localTeam)
+                continue;
+
+            // same logic like bhop
+            mem.Write(globals::clientAddress + offsets::dwForceAttack, 6);
+            this_thread::sleep_for(chrono::milliseconds(20));
+            mem.Write(globals::clientAddress + offsets::dwForceAttack, 4);
+        }
 	}
 }

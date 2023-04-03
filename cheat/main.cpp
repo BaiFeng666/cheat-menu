@@ -16,7 +16,7 @@ int __stdcall wWinMain(
 
 	std::thread(hacks::VisualsThread, mem).detach();
 	std::thread(hacks::miscThread, mem).detach();
-	std::thread(hacks::AimbotThread, mem).detach();
+	std::thread(hacks::botThread, mem).detach();
 
 	// create gui
 	gui::CreateHWindow("Cheat Menu");

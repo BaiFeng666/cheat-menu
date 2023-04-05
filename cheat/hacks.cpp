@@ -41,7 +41,7 @@ void hacks::VisualsThread(const Memory &mem) noexcept {
 
       const auto entityTeam = mem.Read<int32_t>(entity + offsets::m_iTeamNum);
       if (entityTeam == localTeam) continue;
-      // ----------GLOW----------
+      //----------GLOW----------
       if (globals::glow) {
         const auto glowIndex =
             mem.Read<int32_t>(entity + offsets::m_iGlowIndex);
@@ -61,6 +61,7 @@ void hacks::VisualsThread(const Memory &mem) noexcept {
       }
       //----------CHAMS----------
       if (globals::chams) {
+        // convert from int to float because of shitty ImGui
         uint8_t EnemyColor[] = {0, 0, 0};
         for (int i = 0; i < 3; ++i)
           EnemyColor[i] = uint8_t(globals::chamsGuiEnemyColor[i] * 255);
@@ -101,13 +102,13 @@ void hacks::miscThread(const Memory &mem) noexcept {
             : mem.Write<intptr_t>(globals::clientAddress + offsets::dwForceJump,
                                   4);
     // ----------RADAR----------
-    for (auto i = 1; i <= 64; ++i) {
-      const auto entity = mem.Read<uintptr_t>(globals::clientAddress +
-                                              offsets::dwEntityList + i * 0x10);
-      if (!entity) continue;
-
-      if (globals::radar) mem.Write(entity + offsets::m_bSpotted, true);
-    }
+    if (globals::radar)
+      for (auto i = 1; i <= 64; ++i) {
+        const auto entity = mem.Read<uintptr_t>(
+            globals::clientAddress + offsets::dwEntityList + i * 0x10);
+        if (!entity) continue;
+        mem.Write(entity + offsets::m_bSpotted, true);
+      }
     // ----------Ignore Flash----------
     if (globals::ignoreFlash)
       mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f);

@@ -140,7 +140,7 @@ void gui::CreateImGui() noexcept {
   ImGuiIO& io = ::ImGui::GetIO();
   (void)io;
   io.Fonts->AddFontFromFileTTF(
-      "C:\\Users\\Andrian Ataman\\Desktop\\cheat-menu\\cheat\\font.ttf", 14.f);
+      "C:\\Users\\Andrian Ataman\\Desktop\\86-menu\\cheat\\font.ttf", 14.f);
   io.IniFilename = NULL;
 
   // ImGui::StyleColorsClassic();
@@ -202,7 +202,7 @@ void gui::EndRender() noexcept {
 void gui::Render() noexcept {
   ImGui::SetNextWindowPos({0, 0});
   ImGui::SetNextWindowSize({WIDTH, HEIGHT});
-  ImGui::Begin("Stauceni Hacks", &isRunning,
+  ImGui::Begin("86's cheat menu", &isRunning,
                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings |
                    ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
 

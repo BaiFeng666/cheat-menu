@@ -1,41 +1,45 @@
-#include "gui.h"
-#include "hacks.h"
-#include "globals.h"
+/*
+   ____  _____                        __        _ __
+  ( __ )/ ___/   ____ ___  ____ _____/ /__     (_) /_
+ / __  / __ \   / __ `__ \/ __ `/ __  / _ \   / / __/
+/ /_/ / /_/ /  / / / / / / /_/ / /_/ /  __/  / / /_
+\____/\____/  /_/ /_/ /_/\__,_/\__,_/\___/  /_/\__/
+*/
+
 #include <thread>
 
-int __stdcall wWinMain(
-	HINSTANCE instance,
-	HINSTANCE previousInstance,
-	PWSTR arguments,
-	int commandShow)
-{
-	Memory mem{ "csgo.exe" };
+#include "globals.h"
+#include "gui.h"
+#include "hacks.h"
 
-	globals::clientAddress = mem.GetModuleAddress("client.dll");
-	globals::engineAddress = mem.GetModuleAddress("engine.dll");
+int __stdcall wWinMain(HINSTANCE instance, HINSTANCE previousInstance,
+                       PWSTR arguments, int commandShow) {
+  Memory mem{"csgo.exe"};
 
-	std::thread(hacks::VisualsThread, mem).detach();
-	std::thread(hacks::miscThread, mem).detach();
-	std::thread(hacks::botThread, mem).detach();
+  globals::clientAddress = mem.GetModuleAddress("client.dll");
+  globals::engineAddress = mem.GetModuleAddress("engine.dll");
 
-	// create gui
-	gui::CreateHWindow("Cheat Menu");
-	gui::CreateDevice();
-	gui::CreateImGui();
+  std::thread(hacks::VisualsThread, mem).detach();
+  std::thread(hacks::miscThread, mem).detach();
+  std::thread(hacks::botThread, mem).detach();
 
-	while (gui::isRunning)
-	{
-		gui::BeginRender();
-		gui::Render();
-		gui::EndRender();
+  // create gui
+  gui::CreateHWindow("86");
+  gui::CreateDevice();
+  gui::CreateImGui();
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
-	}
+  while (gui::isRunning) {
+    gui::BeginRender();
+    gui::Render();
+    gui::EndRender();
 
-	// destroy gui
-	gui::DestroyImGui();
-	gui::DestroyDevice();
-	gui::DestroyHWindow();
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  }
 
-	return EXIT_SUCCESS;
+  // destroy gui
+  gui::DestroyImGui();
+  gui::DestroyDevice();
+  gui::DestroyHWindow();
+
+  return EXIT_SUCCESS;
 }

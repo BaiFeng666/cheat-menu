@@ -18,11 +18,11 @@ constexpr Vector3 CalculateAngle(const Vector3 &localPosition,
 struct Vector2 {
   float x = {}, y = {};
 };
-auto oldPunch = Vector2{};
+Vector2 oldPunch = Vector2{};
 
 void hacks::VisualsThread(const Memory &mem) noexcept {
   while (gui::isRunning) {
-    this_thread::sleep_for(chrono::milliseconds(7));
+    this_thread::sleep_for(chrono::milliseconds(1));
 
     const auto localPlayer =
         mem.Read<uintptr_t>(globals::clientAddress + offsets::dwLocalPlayer);
@@ -82,7 +82,7 @@ void hacks::VisualsThread(const Memory &mem) noexcept {
 
 void hacks::miscThread(const Memory &mem) noexcept {
   while (gui::isRunning) {
-    this_thread::sleep_for(chrono::milliseconds(7));
+    this_thread::sleep_for(chrono::milliseconds(1));
 
     // get local player
     const auto localPlayer =
@@ -92,7 +92,6 @@ void hacks::miscThread(const Memory &mem) noexcept {
     const auto health = mem.Read<int32_t>(localPlayer + offsets::m_iHealth);
     if (!health) continue;
 
-		const auto baseFlashAlpha = mem.Read<float>(localPlayer + offsets::m_flFlashMaxAlpha);
     // ----------BHOP----------
     const auto flags = mem.Read<int32_t>(localPlayer + offsets::m_fFlags);
     if (globals::bhop)
@@ -113,14 +112,15 @@ void hacks::miscThread(const Memory &mem) noexcept {
       }
     // ----------Ignore Flash----------
     if (globals::ignoreFlash)
-      mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f);
-		else
-			mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, baseFlashAlpha);
+      mem.Write(localPlayer + offsets::m_flFlashDuration, 0.f);
     // ----------Fov----------
-    if (globals::fov)
-      mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);
-    else
-      mem.Write(localPlayer + offsets::m_iFOV, 90);
+    if (globals::fov) {
+      (mem.Read<bool>(localPlayer + offsets::m_bIsScoped))
+          ? mem.Write(localPlayer + offsets::m_iFOV,
+                      mem.Read<int32_t>(localPlayer + offsets::m_iDefaultFOV))
+          : mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);
+    } else
+      mem.Read<int32_t>(localPlayer + offsets::m_iDefaultFOV);
     // ----------Remove Recoil----------
     if (globals::removeRecoil) {
       const auto shotsFired =
@@ -161,7 +161,7 @@ void hacks::miscThread(const Memory &mem) noexcept {
 
 void hacks::botThread(const Memory &mem) noexcept {
   while (gui::isRunning) {
-    this_thread::sleep_for(chrono::milliseconds(7));
+    this_thread::sleep_for(chrono::milliseconds(1));
 
     // get local player
     const auto localPlayer = mem.Read<std::uintptr_t>(globals::clientAddress +

@@ -91,6 +91,8 @@ void hacks::miscThread(const Memory &mem) noexcept {
     // is alive?
     const auto health = mem.Read<int32_t>(localPlayer + offsets::m_iHealth);
     if (!health) continue;
+
+		const auto baseFlashAlpha = mem.Read<float>(localPlayer + offsets::m_flFlashMaxAlpha);
     // ----------BHOP----------
     const auto flags = mem.Read<int32_t>(localPlayer + offsets::m_fFlags);
     if (globals::bhop)
@@ -112,6 +114,8 @@ void hacks::miscThread(const Memory &mem) noexcept {
     // ----------Ignore Flash----------
     if (globals::ignoreFlash)
       mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, 0.f);
+		else
+			mem.Write(localPlayer + offsets::m_flFlashMaxAlpha, baseFlashAlpha);
     // ----------Fov----------
     if (globals::fov)
       mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);

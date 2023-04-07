@@ -115,12 +115,12 @@ void hacks::miscThread(const Memory &mem) noexcept {
       mem.Write(localPlayer + offsets::m_flFlashDuration, 0.f);
     // ----------Fov----------
     if (globals::fov) {
-      (mem.Read<bool>(localPlayer + offsets::m_bIsScoped))
-          ? mem.Write(localPlayer + offsets::m_iFOV,
-                      mem.Read<int32_t>(localPlayer + offsets::m_iDefaultFOV))
-          : mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);
-    } else
-      mem.Read<int32_t>(localPlayer + offsets::m_iDefaultFOV);
+        if (!mem.Read<bool>(localPlayer + offsets::m_bIsScoped))
+            mem.Write(localPlayer + offsets::m_iFOV, globals::fovValue);
+        else
+            if (!mem.Read<bool>(localPlayer + offsets::m_bIsScoped))
+                mem.Write(localPlayer + offsets::m_iFOV, mem.Read<int32_t>(localPlayer + offsets::m_iDefaultFOV));
+    }
     // ----------Remove Recoil----------
     if (globals::removeRecoil) {
       const auto shotsFired =

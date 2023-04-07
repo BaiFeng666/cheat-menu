@@ -139,8 +139,7 @@ void gui::CreateImGui() noexcept {
   ImGui::CreateContext();
   ImGuiIO& io = ::ImGui::GetIO();
   (void)io;
-  io.Fonts->AddFontFromFileTTF(
-      "C:\\Users\\Andrian Ataman\\Desktop\\86-menu\\cheat\\font.ttf", 14.f);
+  io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\msyhbd.ttc", 14.f, NULL, io.Fonts->GetGlyphRangesChineseFull());
   io.IniFilename = NULL;
 
   // ImGui::StyleColorsClassic();
@@ -209,28 +208,28 @@ void gui::Render() noexcept {
   ImGui::Columns(2);
   ImGui::SetColumnWidth(0, 120);
 
-  ImGui::Checkbox("b-hop", &globals::bhop);
-  ImGui::Checkbox("radar", &globals::radar);
-  ImGui::Checkbox("ignore flash", &globals::ignoreFlash);
-  ImGui::Checkbox("triggerbot", &globals::triggerbot);
+  ImGui::Checkbox((const char*)u8"兔子跳", &globals::bhop);
+  ImGui::Checkbox((const char*)u8"雷达", &globals::radar);
+  ImGui::Checkbox((const char*)u8"忽略闪光", &globals::ignoreFlash);
+  ImGui::Checkbox((const char*)u8"自动开枪", &globals::triggerbot);
   if (ImGui::IsItemHovered(3)) ImGui::SetTooltip("Gayyy");
 
-  ImGui::Checkbox("ignore recoil", &globals::removeRecoil);
+  ImGui::Checkbox((const char*)u8"无后坐力", &globals::removeRecoil);
   if (ImGui::IsItemHovered(4)) ImGui::SetTooltip("Hella gayyyy");
 
   ImGui::NextColumn();
-  ImGui::Checkbox("chams", &globals::chams);
-  ImGui::ColorEdit3("enemy color", globals::chamsGuiEnemyColor);
+  ImGui::Checkbox((const char*)u8"chams", &globals::chams);
+  ImGui::ColorEdit3((const char*)u8"敌人颜色", globals::chamsGuiEnemyColor);
 
-  ImGui::Checkbox("glow", &globals::glow);
-  ImGui::ColorEdit4("glow color", globals::glowColor);
+  ImGui::Checkbox((const char*)u8"辉光", &globals::glow);
+  ImGui::ColorEdit4((const char*)u8"辉光颜色", globals::glowColor);
 
-  ImGui::Checkbox("fov", &globals::fov);
-  ImGui::SliderInt("fov changer", &globals::fovValue, 60, 130);
+  ImGui::Checkbox((const char*)u8"视野", &globals::fov);
+  ImGui::SliderInt((const char*)u8"改变视野", &globals::fovValue, 60, 130);
 
-  ImGui::Checkbox("aimbot", &globals::aimbot);
-  ImGui::SliderInt("aimbot smoothness", &globals::aimbotSmooth, 1, 20);
-  ImGui::SliderInt("aimbot fov", &globals::aimbotFov, 1, 30);
+  ImGui::Checkbox((const char*)u8"自瞄", &globals::aimbot);
+  ImGui::SliderInt((const char*)u8"平滑度", &globals::aimbotSmooth, 1, 20);
+  ImGui::SliderInt((const char*)u8"范围", &globals::aimbotFov, 1, 30);
 
   // For changing styles
   // ImGui::ShowStyleEditor();
